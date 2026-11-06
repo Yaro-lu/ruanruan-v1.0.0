@@ -1,0 +1,24 @@
+[Unit]
+Description=Independent Ruanruan character heartbeat
+Wants=network-online.target wechat-desktop-runtime.service
+After=network-online.target wechat-desktop-runtime.service
+
+[Service]
+Type=simple
+WorkingDirectory=/ABSOLUTE/PATH/TO/ruanruan
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+Environment=TZ=Asia/Shanghai
+Environment=WCB_DATA_DIR=/HOME/OF/DEPLOY_USER/.wechat-codex-desktop/app
+Environment=WCB_BUILD_DIR=/ABSOLUTE/PATH/TO/ruanruan/dist-desktop
+Environment=WCB_CODEX_RUNTIME_SOCKET=/HOME/OF/DEPLOY_USER/.wechat-codex-desktop/app/codex-runtime.sock
+ExecStartPre=/usr/bin/mkdir -p /HOME/OF/DEPLOY_USER/.wechat-codex-desktop/app/character-life
+ExecStart=/usr/bin/flock --nonblock --conflict-exit-code=75 /HOME/OF/DEPLOY_USER/.wechat-codex-desktop/app/character-life/heartbeat.lock /usr/bin/node /ABSOLUTE/PATH/TO/ruanruan/dist-desktop/src/life-daemon.js
+UMask=0077
+Restart=on-failure
+RestartSec=5
+RestartPreventExitStatus=75
+TimeoutStopSec=15
+KillMode=control-group
+
+[Install]
+WantedBy=default.target

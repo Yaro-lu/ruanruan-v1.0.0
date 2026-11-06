@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "enabled": false,
+  "accountId": "desktop-ruanruan",
+  "ownerPeerId": "",
+  "exchangeDirectory": "/HOME/OF/DEPLOY_USER/.wechat-codex-desktop/exchange",
+  "queueDirectory": "/HOME/OF/DEPLOY_USER/.wechat-codex-desktop/bridge",
+  "contacts": []
+}

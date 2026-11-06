@@ -1,0 +1,29 @@
+[Unit]
+Description=Ruanruan personal WeChat through the visible desktop
+After=network.target wechat-desktop-runtime.service
+Wants=wechat-desktop-runtime.service
+
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+WorkingDirectory=/ABSOLUTE/PATH/TO/ruanruan
+ExecStart=/usr/bin/node dist-desktop/src/main.js start
+Environment=PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin
+Environment=WCB_CHANNEL=desktop
+Environment=WCB_DESKTOP_CONFIG=/HOME/OF/DEPLOY_USER/.wechat-codex-desktop/bridge.json
+Environment=WCB_DATA_DIR=/HOME/OF/DEPLOY_USER/.wechat-codex-desktop/app
+Environment=WCB_CODEX_RUNTIME_SOCKET=/HOME/OF/DEPLOY_USER/.wechat-codex-desktop/app/codex-runtime.sock
+UMask=0077
+Slice=wechat-chat.slice
+MemoryHigh=128M
+MemoryMax=192M
+MemorySwapMax=96M
+CPUWeight=100
+Restart=always
+RestartSec=10
+StandardOutput=append:/HOME/OF/DEPLOY_USER/.wechat-codex-desktop/app/logs/stdout.log
+StandardError=append:/HOME/OF/DEPLOY_USER/.wechat-codex-desktop/app/logs/stderr.log
+
+[Install]
+WantedBy=default.target

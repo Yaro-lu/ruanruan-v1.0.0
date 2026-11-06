@@ -1,0 +1,11 @@
+[Unit]
+Description=WeChat remote desktop manual takeover socket
+
+[Socket]
+ListenStream=%h/.wechat-codex-desktop/exchange/manual-control.sock
+SocketMode=0600
+Accept=yes
+RemoveOnStop=yes
+
+[Install]
+WantedBy=sockets.target

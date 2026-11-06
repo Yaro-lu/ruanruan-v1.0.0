@@ -1,0 +1,43 @@
+name: ruanruan-wechat-desktop
+services:
+  wechat:
+    image: ghcr.io/nickrunning/wechat-selkies@sha256:aefb35f900b3c821ae38830e88053d19a860e5be6960e25e2999de28d8e35d15
+    container_name: ruanruan-wechat-gui
+    restart: "no" # systemd starts it only after the direct-network rules exist
+    env_file:
+      - /HOME/OF/DEPLOY_USER/.wechat-codex-desktop/desktop.env
+    environment:
+      SELKIES_FRAMERATE: "8"
+    ports:
+      - "127.0.0.1:3290:3000"
+    volumes:
+      - ./start-wechat.sh:/scripts/start.sh:ro
+      - ./init-selkies-control.sh:/custom-cont-init.d/50-ruanruan-control:ro
+      - ./install_selkies_control.py:/opt/ruanruan/install_selkies_control.py:ro
+      - ./selkies_manual_control.py:/opt/ruanruan/selkies_manual_control.py:ro
+      - /HOME/OF/DEPLOY_USER/.wechat-codex-desktop/config:/config
+      - /HOME/OF/DEPLOY_USER/.wechat-codex-desktop/exchange:/exchange
+    shm_size: 256m
+    mem_limit: 1200m
+    memswap_limit: 2g
+    cpus: 1.0
+    cpu_shares: 256
+    dns:
+      - 223.5.5.5
+      - 119.29.29.29
+    networks:
+      direct:
+        ipv4_address: 10.203.77.2
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "2"
+networks:
+  direct:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: br-rr-wechat
+    ipam:
+      config:
+        - subnet: 10.203.77.0/24

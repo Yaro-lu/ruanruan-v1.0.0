@@ -1,0 +1,22 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';
+import {join} from 'node:path';
+import {tmpdir} from 'node:os';
+const root=mkdtempSync(join(tmpdir(),'character-models-'));process.env.WCB_DATA_DIR=root;
+const {loadCharacterModels}=await import('../src/character-models.js');
+const {conversationOptions}=await import('../src/companion-profile.js');
+test.after(()=>rmSync(root,{recursive:true,force:true}));
+test('role targets leave server-control routing intact and support distinct writer and reviewer',()=>{
+ assert.deepEqual(loadCharacterModels(),{});mkdirSync(join(root,'providers'));
+ const generation={model:'gpt-6-sol',reasoningEffort:'low',serviceTier:'fast'};
+ const review={model:'gpt-6.1-sol',reasoningEffort:'low',serviceTier:'fast'};
+ const repair={model:'gpt-6-astra',reasoningEffort:'medium',serviceTier:'default'};
+ writeFileSync(join(root,'providers/character-models.json'),JSON.stringify({generation,review,repair}));
+ const route={kind:'manual' as const,reason:'owner',options:{model:'gpt-6.1-sol',reasoningEffort:'high' as const,serviceTier:'default' as const}};
+ assert.deepEqual(conversationOptions(route,'work'),route.options);
+ const role=conversationOptions(route,'companion');assert.equal(role.model,generation.model);
+ assert.deepEqual(role.reviewTarget,review);assert.deepEqual(role.repairTarget,repair);
+ writeFileSync(join(root,'providers/character-models.json'),JSON.stringify({review:{...review,reasoningEffort:'typo'}}));
+ assert.throws(()=>loadCharacterModels(),/Invalid character/);
+});

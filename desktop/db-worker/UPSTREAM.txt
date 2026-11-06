@@ -1,0 +1,7 @@
+Read-only database, SQLCipher key discovery, media decoding and outgoing
+verification are reused from ChisBread/wechat-ai, GPL-3.0-or-later.
+https://github.com/ChisBread/wechat-ai
+Pinned revision: 638e98e51fd373f11d62965a41bccb603d63954c
+The installer checks out this exact revision outside the application repository.
+The upstream source and license remain in the reader image. No upstream bot,
+AI client, remote API, desktop startup script or additional WeChat is started.

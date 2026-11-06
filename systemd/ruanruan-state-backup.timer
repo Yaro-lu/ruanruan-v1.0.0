@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily private state snapshot
+
+[Timer]
+OnCalendar=*-*-* 04:30:00 Asia/Shanghai
+Persistent=true
+RandomizedDelaySec=5min
+Unit=ruanruan-state-backup.service
+
+[Install]
+WantedBy=timers.target

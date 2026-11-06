@@ -1,0 +1,11 @@
+#!/bin/bash
+set -euo pipefail
+desktop_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+export WCB_DESKTOP_DATA="${WCB_DESKTOP_DATA:-$(/usr/bin/python3 -c 'from pathlib import Path; print(Path.home()/".wechat-codex-desktop")')}"
+mcp_args="$(/usr/bin/python3 -c 'import json,sys; from pathlib import Path; print(json.dumps([str(Path(sys.argv[1])/"wechat_gui.py"),"mcp"]))' "$desktop_dir")"
+# Supply this session's MCP explicitly; do not change the user's global config.
+exec codex -C "$desktop_dir" \
+  -c 'mcp_servers.wechat_desktop.command="/usr/bin/python3"' \
+  -c "mcp_servers.wechat_desktop.args=$mcp_args" \
+  -c 'mcp_servers.wechat_desktop.startup_timeout_sec=15' \
+  -c 'mcp_servers.wechat_desktop.tool_timeout_sec=30' "$@"

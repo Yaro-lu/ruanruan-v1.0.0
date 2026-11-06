@@ -1,0 +1,8 @@
+[Unit]
+Description=Shared budget for Ruanruan character chat workers
+
+[Slice]
+CPUWeight=100
+MemoryHigh=640M
+MemoryMax=896M
+MemorySwapMax=384M

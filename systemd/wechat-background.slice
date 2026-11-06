@@ -1,0 +1,10 @@
+[Unit]
+Description=Shared budget for Ruanruan repair, memory and life background work
+
+[Slice]
+CPUWeight=20
+CPUQuota=75%
+IOWeight=20
+MemoryHigh=640M
+MemoryMax=896M
+MemorySwapMax=384M

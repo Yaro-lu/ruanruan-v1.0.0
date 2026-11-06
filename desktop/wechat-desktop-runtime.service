@@ -1,0 +1,26 @@
+[Unit]
+Description=Codex runtime for the personal WeChat desktop channel
+After=network.target
+
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+WorkingDirectory=/ABSOLUTE/PATH/TO/ruanruan
+ExecStart=/usr/bin/node scripts/codex-runtime.mjs
+Environment=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+Environment=WCB_DATA_DIR=/HOME/OF/DEPLOY_USER/.wechat-codex-desktop/app
+ExecStartPost=/usr/bin/timeout 45 /bin/sh -c 'until test -S /HOME/OF/DEPLOY_USER/.wechat-codex-desktop/app/codex-runtime.sock; do sleep 0.1; done'
+UMask=0077
+Slice=wechat-chat.slice
+MemoryHigh=448M
+MemoryMax=640M
+MemorySwapMax=256M
+CPUWeight=100
+Restart=always
+RestartSec=3
+KillMode=control-group
+TimeoutStopSec=20
+
+[Install]
+WantedBy=default.target

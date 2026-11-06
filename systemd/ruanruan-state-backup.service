@@ -1,0 +1,15 @@
+[Unit]
+Description=Private Ruanruan desktop state snapshot with SQLite backup API
+
+[Service]
+Type=oneshot
+WorkingDirectory=/ABSOLUTE/PATH/TO/ruanruan
+ExecStart=/usr/bin/python3 scripts/backup-character-state.py backup --desktop /HOME/OF/DEPLOY_USER/.wechat-codex-desktop --prune-owned --retain-days 7
+UMask=0077
+Nice=15
+IOSchedulingClass=idle
+CPUQuota=20%
+MemoryMax=192M
+TimeoutStartSec=15min
+NoNewPrivileges=true
+

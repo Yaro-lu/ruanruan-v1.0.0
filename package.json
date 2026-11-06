@@ -1,0 +1,50 @@
+{
+  "name": "wechat-codex",
+  "version": "1.0.0",
+  "description": "Ruanruan personal WeChat character via the official desktop client",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:desktop": "tsc --outDir dist-desktop",
+    "postinstall": "npm run build",
+    "start": "node dist/src/main.js",
+    "dev": "tsc --watch",
+    "test": "npm run build && node --test dist/tests/*.test.js",
+    "setup": "node dist/src/main.js setup",
+    "media:refresh": "node scripts/refresh-local-media.mjs"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4",
+    "qrcode-terminal": "^0.12.0",
+    "sharp": "^0.35.5",
+    "sqlite-vec": "0.1.9",
+    "undici": "^7.30.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/qrcode": "^1.5.6",
+    "@types/qrcode-terminal": "^0.12.0",
+    "typescript": "^5.7.0"
+  },
+  "keywords": [
+    "wechat",
+    "codex",
+    "openai",
+    "agent",
+    "cli",
+    "bridge"
+  ],
+  "author": "DrDavidDa",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yaro-lu/ruanruan.git"
+  },
+  "homepage": "https://github.com/Yaro-lu/ruanruan#readme",
+  "bugs": {
+    "url": "https://github.com/Yaro-lu/ruanruan/issues"
+  }
+}

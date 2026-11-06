@@ -1,0 +1,12 @@
+[Unit]
+Description=WeChat remote desktop manual takeover session
+
+[Service]
+Type=simple
+WorkingDirectory=/ABSOLUTE/PATH/TO/ruanruan/desktop
+ExecStart=/usr/bin/python3 manual_control.py session --quiet-release
+StandardInput=socket
+StandardOutput=inherit
+StandardError=journal
+UMask=0077
+TimeoutStopSec=5

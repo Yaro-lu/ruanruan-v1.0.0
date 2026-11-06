@@ -1,0 +1,16 @@
+[Unit]
+Description=Persistent official WeChat GUI for Codex CLI
+After=docker.service ruanruan-wechat-direct.service
+Requires=docker.service ruanruan-wechat-direct.service
+
+[Service]
+Type=simple
+WorkingDirectory=/ABSOLUTE/PATH/TO/ruanruan/desktop
+ExecStart=/usr/bin/docker compose -f compose.yaml up --no-color --abort-on-container-exit
+ExecStop=/usr/bin/docker compose -f compose.yaml stop
+Restart=always
+RestartSec=10
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

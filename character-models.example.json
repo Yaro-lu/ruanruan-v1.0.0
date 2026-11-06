@@ -1,0 +1,17 @@
+{
+  "generation": {
+    "model": "gpt-6-sol",
+    "reasoningEffort": "low",
+    "serviceTier": "default"
+  },
+  "review": {
+    "model": "gpt-6-sol",
+    "reasoningEffort": "low",
+    "serviceTier": "default"
+  },
+  "repair": {
+    "model": "gpt-6.1-sol",
+    "reasoningEffort": "medium",
+    "serviceTier": "default"
+  }
+}

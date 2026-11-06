@@ -1,0 +1,26 @@
+[Unit]
+Description=Ruanruan isolated automatic repair worker
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/ABSOLUTE/PATH/TO/ruanruan
+ExecStart=/usr/bin/python3 -u desktop/repair_worker.py
+Environment=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+Environment=WCB_DESKTOP_DATA=/HOME/OF/DEPLOY_USER/.wechat-codex-desktop
+UMask=0077
+Nice=10
+CPUWeight=10
+CPUQuota=100%
+IOWeight=10
+Slice=wechat-background.slice
+MemoryHigh=512M
+MemoryMax=768M
+MemorySwapMax=256M
+KillMode=control-group
+TimeoutStopSec=15
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target

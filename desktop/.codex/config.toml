@@ -1,0 +1,7 @@
+[mcp_servers.wechat_desktop]
+command = "/usr/bin/python3"
+# Relative to the desktop working directory. The codex-wechat launcher also
+# supplies the resolved absolute script path, so it works from any directory.
+args = ["wechat_gui.py", "mcp"]
+startup_timeout_sec = 15
+tool_timeout_sec = 30

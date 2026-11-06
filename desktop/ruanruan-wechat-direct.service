@@ -1,0 +1,13 @@
+[Unit]
+Description=Direct ISP routing for Ruanruan WeChat desktop
+After=network-online.target docker.service mihomo.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /ABSOLUTE/PATH/TO/ruanruan/desktop/direct-network.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
