@@ -1,4 +1,4 @@
-# Ruanruan
+# Ruanruan V1.0.0
 
 [简体中文](README.md) | **English**
 

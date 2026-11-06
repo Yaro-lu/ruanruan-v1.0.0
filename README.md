@@ -1,4 +1,4 @@
-# 阮阮
+# 阮阮V1.0.0
 
 **简体中文** | [English](README.en.md)
 
