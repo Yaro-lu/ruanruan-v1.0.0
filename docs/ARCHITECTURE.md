@@ -1,14 +1,12 @@
-# 阮阮架构与消息流程 / Architecture
+# 阮阮架构与消息流程
+
+**简体中文** | [English](ARCHITECTURE.en.md)
 
 阮阮是运行在 Linux 官方个人微信客户端上的人物聊天系统：只读本地消息数据库收件，经独立审查后通过客户端 GUI 发消息。人物会话、身份、关系、记忆、生活状态和发送凭据保存在本机。部署步骤见 [DEPLOYMENT.md](DEPLOYMENT.md)，运行入口见 [desktop/README.md](../desktop/README.md)。
-
-Ruanruan receives messages from the official Linux WeChat client's local database in read-only mode. Reviewed replies are sent through the visible client UI and confirmed against new outgoing database records. Identity, conversation, memory, life state and delivery evidence remain local.
 
 ## 对话主流程
 
 **紫色节点为远程模型请求，蓝色节点为本地程序。** 远程请求按配置选择供应方 API 或 Codex；本地 Codex app-server 负责人物工具编排，不表示模型在本地运行。普通 `@`、邮箱和表情不等于微信原生提及。
-
-**Purple = remote model request; blue = local processing.** Model providers and credentials are configurable. Local app-server orchestration does not make the model local.
 
 ```mermaid
 flowchart TD
@@ -111,8 +109,6 @@ flowchart LR
 进程异常由 systemd 与本地退避恢复。游标、队列和回执用于避免漏读、重复交付及崩溃后盲目重发；这不保证每个中断点都能无人干预恢复。账号核验、掉线与不确定发送保持暂停，需人工核对现场。工程防重复不能量化或保证微信账号不受风控。
 
 备份使用 SQLite backup API 生成各库一致快照并校验清单；它不是跨全部数据库同一事务。恢复演练只写新临时目录，不覆盖在线状态。人物提示词、凭据、真实聊天、素材与备份应按部署边界管理，不把私有运行数据提交到仓库。
-
-**English:** A speaking turn normally uses generation and review; revision adds a revision call and re-review. Speech, embedding, image generation, life decisions and isolated repair are conditional remote calls. Local OCR, queues, receipts, process supervision and backups are not remote-model calls. All delivery decisions still pass host-side checks. Uncertain sends are held, not blindly replayed. Manual takeover and crash recovery have observable boundaries; neither guarantees unattended completion or freedom from platform account restrictions.
 
 ## 代码入口
 

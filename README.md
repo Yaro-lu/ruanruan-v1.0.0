@@ -1,8 +1,8 @@
-# 阮阮 Ruanruan
+# 阮阮
+
+**简体中文** | [English](README.en.md)
 
 **一个有连续人格、关系记忆与生活状态的微信人物聊天系统。** 项目已实现个人微信私聊和群聊的自动收件、人物回复、独立审稿、图片与视频分享、长期记忆、生活心跳、人工接管及故障恢复。消息来自官方 Linux 微信客户端的本地数据库，发送通过可见客户端界面完成。
-
-**Ruanruan is a persistent character for personal WeChat.** It combines private and group conversations, an independent reply reviewer, scoped long-term memory, a simulated daily life, curated image/video sharing, browser takeover and durable delivery recovery. Incoming messages are read from the official Linux client's local database; reviewed replies are sent through its visible UI.
 
 本仓库提供当前阮阮的源码、人物提示词、配置示例与部署说明。真实账号、聊天、凭据、私有素材及本机其他接入不随仓库发布。人格设定以双方知晓的 AI 虚构人物交流为前提，生活账本是角色模拟状态。
 
@@ -23,7 +23,7 @@
 
 **目标环境：Linux + Docker/Compose + systemd + Node.js ≥ 22.13.0 + Python ≥ 3.11 + Codex app-server。** 模型可用已登录的 Codex 或配置的 API 供应方，OCR 使用本地 RapidOCR/ONNX Runtime。首次微信登录需要本人扫码和身份核对。
 
-1. 阅读 [完整部署说明与中英文 AI 部署提示词](docs/DEPLOYMENT.md)。其中包含主机检查、模型凭据、容器网络、首次登录、启用、验收、备份和恢复步骤。
+1. 阅读 [完整部署说明与 AI 部署提示词](docs/DEPLOYMENT.md)。其中包含主机检查、模型凭据、容器网络、首次登录、启用、验收、备份和恢复步骤。
 2. 编译源码，适配桌面模板，保持自动收发禁用；配置人物提示词、模型与私有素材目录。
 3. 启动桌面，通过 SSH 隧道打开网页，真人扫码并核对微信号、管理员和会话。
 4. 在离线验证通过、身份核对完成后执行数据库准备，再启用自动收发。已有安装保留身份、游标、会话、暂停和回执，不用新安装模板覆盖运行数据。
@@ -36,7 +36,7 @@ npm run build:desktop
 # 接着按 docs/DEPLOYMENT.md 配置与登录；编译成功不等于已启用微信。
 ```
 
-希望让 AI 协助部署，可以复制下面这段，或使用部署文档中更完整的中英文版本：
+希望让 AI 协助部署，可以复制下面这段，或使用部署文档中更完整的中文版：
 
 > 请基于此仓库部署阮阮。先读取 AGENTS.md、desktop/AGENTS.md、docs/DEPLOYMENT.md，检查主机、现有服务和配置；按实际环境适配模板，保留其他项目。先编译和执行离线测试，再以禁用收发的配置安装桌面、读库和运行时。凭据只保存在本机，不写入 Git。需要微信扫码、手机确认和身份核对时交给我；核对完成后按文档 prepare、启用，真实聊天由我验收。最后给出访问地址、服务状态、备份/恢复方法和未完成项。不自行发送合成测试消息或调用真实模型采样。
 
@@ -46,11 +46,9 @@ npm run build:desktop
 
 # 技术设计：持续人格、来源化记忆与可确认的交付
 
-## 摘要 / Abstract
+## 摘要
 
 本项目研究的工程问题是：如何让一个长期生活在微信里的虚构人物，在多次对话、多人群聊、媒体分享与程序重启之后，仍保持身份、事实、关系与行为的一致性。系统采用“固定人格提示词 + 本地动态状态 + 带来源长期记忆 + 独立审稿 + 可确认交付”的分层结构。模型负责理解、表达和候选决策，程序负责身份、范围、状态约束、素材可用性与发送证据。本文描述当前源码中的机制与设计取舍；没有把运行经验包装为对照实验，也不以未经测量的指标宣称人格效果或速度提升。
-
-**Abstract.** This system separates character definition, dynamic life state, evidence-linked memory, reply review and delivery confirmation. Models propose interpretations and responses; local code enforces identity, visibility, state constraints and delivery evidence. Text recall combines lexical and vector retrieval. Media uses a curated catalog and a conversation-scoped delivery ledger. This document describes implemented mechanisms and their limitations, rather than claiming controlled experimental results.
 
 ## 1. 设计目标与状态分层
 

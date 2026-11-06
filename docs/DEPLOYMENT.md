@@ -1,4 +1,6 @@
-# 阮阮部署说明 / Deployment
+# 阮阮部署说明
+
+**简体中文** | [English](DEPLOYMENT.en.md)
 
 本仓库部署 Linux 官方个人微信人物聊天：只读本地数据库收件，经过生成与独立审稿，通过客户端 GUI 发送。支持私聊、群聊、记忆与关系状态、媒体、可选语音转写和人物生活心跳。功能与模型调用见 [架构说明](ARCHITECTURE.md)。
 
@@ -268,26 +270,4 @@ python3 scripts/backup-character-state.py restore-drill '<SNAPSHOT_DIRECTORY>' -
 真人扫码、手机确认和人物/管理员身份及唯一备注核对是人工步骤。复用已有可信本机资料，集中列出缺失信息，继续独立工作。登录后运行 reader 安装器，保持收发禁用执行 --prepare，保存绑定/水位后再 activate database transport。联系人路由会启用多用户处理，管理员绑定不是白名单；如果我要求仅管理员，先增加明确过滤并离线验证，不能用 multiUser=false 假装隔离。
 不要调用真实模型采样、发合成测试消息、点击核验/申诉或盲目重发不确定交付；正式聊天由我验收。在授权范围内连续完成，不增加逐命令审批。
 交付变更文件、本机配置与数据位置、离线结果、状态/启停/日志命令、网页入口、接管退出方法、可选能力状态及剩余人工步骤。分别报告离线验证、服务运行和真实送达；不要声称零配置或全部验收。
-```
-
-## English deployment summary
-
-Install the official Linux personal-WeChat character channel. Use Node >= 22.13, Python >= 3.11, Docker Compose, systemd user services and a compatible Codex app-server. Sections 1–3 contain the dependency/build/offline-test commands and disabled configuration. Keep the three model roles separate and keep all credentials local.
-
-Adapt host paths, UID/GID, interfaces, subnets, routing and units. Install the manual-control socket before starting the login desktop through direct-network → GUI services. Access it through the SSH tunnel at `http://127.0.0.1:13390/`, or configure trusted HTTPS/WebSockets for a non-localhost endpoint.
-
-A human scans the official client's QR code and verifies both account identities and the owner's unique contact label. Populate the disabled owner route, run the reader installer (it includes the required build files), then `--prepare`. Preparation saves bindings/watermarks without ingesting tasks or sending; deferred group background is imported after activation without discarding newer messages. Activate only after verification. Route synchronization enables multiple contacts/groups; owner binding is not an intake allowlist.
-
-Validate through normal human conversations. Check server-confirmed receipts, not clicks. Manual takeover holds the UI lock; inspect in-flight jobs after release. Optional media, ASR, image generation, embedding, heartbeats and notifications require configuration. Backups and restore drills must preserve live state. Report missing capabilities rather than claiming a zero-configuration deployment.
-
-## Copyable AI deployment prompt
-
-```text
-Deploy this Ruanruan repository on the current Linux host. Complete the authorized automation.
-Read AGENTS.md, desktop/AGENTS.md, docs/DEPLOYMENT.md, desktop/README.md, package.json, Compose, installers and units. Inspect the real user, paths, dependencies, resources, interfaces and routing. Adapt template values narrowly; preserve unrelated projects.
-Deploy the official personal-WeChat character channel: read-only local DB intake and reviewed GUI sending. Install dependencies, build, run offline fixture tests, create disabled configuration and GENERATE.md/REVIEW.md links, and configure generation/review/revision from character-models.example.json. Keep credentials in private local 0600 files, never in output or Git. Report unavailable media, ASR, notifications and other optional services.
-Adapt this project's direct-network rules while preserving other containers and the model proxy. Install the manual-control socket/hook before starting only the login desktop. Provide a localhost SSH tunnel or trusted HTTPS endpoint.
-A human must scan the official client QR code, approve phone login, and verify both account identities plus the owner's unique contact label. Reuse verified local information, consolidate missing inputs, and continue independent work. After login run the reader installer and --prepare with automatic intake/sending disabled, then activate database transport after verification. Route synchronization enables multiple contacts/groups; owner binding is not an allowlist. If I require owner-only responses, implement and offline-test explicit filtering rather than claiming multiUser=false provides isolation.
-Do not run live model samples, send synthetic messages, click verification/appeal controls or blindly resend uncertain deliveries. I will perform live chat acceptance. Continue authorized reversible setup without requesting approval for each command.
-Deliver changed files, local config/data paths, offline results, start/stop/status/log commands, the browser entry, takeover/release instructions, optional capability status and exact remaining human steps. Distinguish offline validation, running services and confirmed delivery. Do not promise zero-configuration setup or complete live acceptance.
 ```
