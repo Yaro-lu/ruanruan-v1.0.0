@@ -80,7 +80,7 @@
 2. **获取源码并编译。**
 
    ```bash
-   git clone <YOUR_PRIVATE_REPOSITORY_URL> ruanruan
+   git clone https://github.com/Yaro-lu/ruanruan-v1.0.0.git ruanruan
    cd ruanruan
    npm ci
    npm run build:desktop

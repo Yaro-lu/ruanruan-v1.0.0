@@ -29,10 +29,10 @@ df -h
 
 ## 2. 检出、编译与离线验证
 
-仓库地址由所有者提供，使用 SSH 或本机 Git 凭据，不把 token 写进 URL。
+公开仓库可直接通过下面的 HTTPS 地址克隆。推送修改时使用 SSH 或本机 Git 凭据，不把 token 写进 URL。
 
 ```bash
-git clone <YOUR_PRIVATE_REPOSITORY_URL> ruanruan
+git clone https://github.com/Yaro-lu/ruanruan-v1.0.0.git ruanruan
 cd ruanruan
 export RR_ROOT="$(pwd -P)"
 export RR_DATA="$HOME/.wechat-codex-desktop"
