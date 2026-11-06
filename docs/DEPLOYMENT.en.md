@@ -32,7 +32,7 @@ The deployment user needs Docker access and working user systemd. Configure `log
 The public repository can be cloned over HTTPS without authentication. Use SSH or local Git credentials when pushing changes; do not embed tokens in URLs.
 
 ```bash
-git clone https://github.com/Yaro-lu/ruanruan-v1.0.0.git ruanruan
+git clone https://github.com/Yaro-lu/ruanruan.git ruanruan
 cd ruanruan
 export RR_ROOT="$(pwd -P)"
 export RR_DATA="$HOME/.wechat-codex-desktop"

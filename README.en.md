@@ -80,7 +80,7 @@ Generation, review and revision are separate roles. They may use independent cal
 2. **Check out and build.**
 
    ```bash
-   git clone https://github.com/Yaro-lu/ruanruan-v1.0.0.git ruanruan
+   git clone https://github.com/Yaro-lu/ruanruan.git ruanruan
    cd ruanruan
    npm ci
    npm run build:desktop

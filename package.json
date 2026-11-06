@@ -41,10 +41,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Yaro-lu/ruanruan-v1.0.0.git"
+    "url": "https://github.com/Yaro-lu/ruanruan.git"
   },
-  "homepage": "https://github.com/Yaro-lu/ruanruan-v1.0.0#readme",
+  "homepage": "https://github.com/Yaro-lu/ruanruan#readme",
   "bugs": {
-    "url": "https://github.com/Yaro-lu/ruanruan-v1.0.0/issues"
+    "url": "https://github.com/Yaro-lu/ruanruan/issues"
   }
 }
