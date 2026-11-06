@@ -89,6 +89,10 @@ chmod 600 "$RR_DATA/bridge.json" "$RR_DATA/app/providers/character-models.json"
 | review | `gpt-6-sol` | `low` | `default` |
 | repair（正文修稿） | `gpt-6.1-sol` | `medium` | `default` |
 
+**模型接入与选择：** 本项目适配 Codex CLI（`app-server`）以及 OpenAI 格式的模型 API；主对话接入固定使用 Responses API，第三方端点须支持 `/responses`、流式输出与工具调用。仅支持 Chat Completions 的服务需先经过提供 Responses 转换的网关。API 模式仍使用本地 Codex CLI 编排，不代表本地模型推理。
+
+中文人物聊天可优先尝试 **DeepSeek V4.1 Flash** 或 **Gemini 3.8 Flash**；作者在当前项目中的体验更偏好它们的中文口语与群聊接话效果，属于场景体验建议。具体 ID、兼容边界和官方资料见 [首页模型说明](../README.md#模型接入与推荐)。仓库中的 GPT 型号是参考配置；切换服务时须同时核对生成、审稿、修稿和后台任务的模型 ID，不能只替换 `baseUrl`。
+
 供应方须支持所选模型；不可用时明确报告。人物模型可使用已登录的 Codex 或配置 API。API 示例保存到 `app/providers/llm.json`：
 
 ```json
@@ -271,3 +275,4 @@ python3 scripts/backup-character-state.py restore-drill '<SNAPSHOT_DIRECTORY>' -
 不要调用真实模型采样、发合成测试消息、点击核验/申诉或盲目重发不确定交付；正式聊天由我验收。在授权范围内连续完成，不增加逐命令审批。
 交付变更文件、本机配置与数据位置、离线结果、状态/启停/日志命令、网页入口、接管退出方法、可选能力状态及剩余人工步骤。分别报告离线验证、服务运行和真实送达；不要声称零配置或全部验收。
 ```
+

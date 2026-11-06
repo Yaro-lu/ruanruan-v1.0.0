@@ -2,55 +2,111 @@
 
 [简体中文](README.md) | **English**
 
-**A persistent WeChat character with a continuous personality, relationship memory and simulated daily life.** The project implements private and group conversations, independent reply review, image/video sharing, long-term memory, life heartbeats, browser takeover and fault recovery. Incoming messages are read from the official Linux WeChat client's local database; replies are sent through its visible interface.
+**A persistent WeChat character agent built around the official client and independent reply review.**
 
-This repository contains the current character implementation, persona prompts, configuration examples and deployment instructions. Real accounts, conversations, credentials, private media and other local integrations are excluded. The persona assumes both participants understand that Ruanruan is a fictional AI character; her life ledger represents simulated state.
+Ruanruan addresses the generic assistant voice, factual drift and state discontinuity that emerge in long-running character conversations. It combines read-only incremental database intake with visible GUI sending, supporting private/group conversations, text, images, videos, a private media library and voice-transcription input. Fixed persona constraints, dynamic life state, evidence-linked memory and an M1/M2/M3 review-and-delivery pipeline support continuous interaction across conversations.
 
-## What is implemented
+The goal is consistent identity, facts, relationships and behavior across repeated chats and restarts, with natural, warm expression. Long-term stability requires continued observation; the examples below show actual conversational behavior.
 
-| Capability | Current behavior |
+[Features](#core-features) · [Examples](#conversation-examples) · [Models](#model-integration-and-recommendations) · [Deployment](#quick-start-and-deployment) · [Technical design](#technical-design)
+
+## Core features
+
+- **Official-client transport:** Read-only incremental database intake and GUI sending, without Hook injection or an unofficial message-sending protocol. New outgoing records confirm delivery.
+- **Layered persona and life:** Separate fixed character definition, shared energy/mood/finances, per-person relationships and public group context, reducing state overwrites and private-context leakage.
+- **Generation, review and revision:** M1 generation and independent M2 review, followed by M3 revision and re-review when needed. Dialogue and internal state are checked separately to reduce confusion between intended and completed actions.
+- **Lightweight persistent memory:** SQLite, FTS5 and sqlite-vec provide hybrid retrieval, evidence-linked corrections and forgetting tombstones while distinguishing facts, plans, reports and uncertainty.
+- **Multimodal interaction and private media:** Existing photos, videos and cartoon reactions first; existing voice transcripts or optional ASR; delivery history to reduce repeats, plus optional asynchronous image generation.
+- **Takeover and recovery:** Browser interaction holds the shared UI lock. Durable queues, receipts, supervision and backups support recovery; uncertain sends retain evidence for inspection.
+
+> **Operating boundary:** Automating the real client still carries WeChat account-restriction risk. This project is for engineering research; use a test account and comply with applicable platform terms.
+
+## Conversation examples
+
+These project conversation excerpts illustrate continuity across time, group banter and restraint about unknown information. They demonstrate voice and interaction, rather than quantified evidence of long-term stability or model superiority. Screenshots preserve the original Chinese conversations.
+
+<table>
+  <tr>
+    <th width="33%">Continuity across time</th>
+    <th width="33%">Natural group banter</th>
+    <th width="33%">Not inventing unknown details</th>
+  </tr>
+  <tr>
+    <td valign="top" align="center"><img src="docs/images/chat-continuity.jpg" alt="A private chat continuing an earlier topic" width="270"></td>
+    <td valign="top" align="center"><img src="docs/images/group-banter.png" alt="A group chat with a playful guess and follow-up" width="270"></td>
+    <td valign="top" align="center"><img src="docs/images/group-uncertainty.png" alt="A group reply declining to invent private information" width="270"></td>
+  </tr>
+</table>
+
+## Model integration and recommendations
+
+### Integration paths
+
+The project supports **Codex CLI** and **OpenAI-format model APIs**. Both use the local Codex CLI `app-server` for orchestration, with a configurable model source:
+
+| Path | Behavior |
 | --- | --- |
-| WeChat conversations | Private chats, native mentions and quoted-message triggers, active group participation, public group context and standby checks; the character may remain quiet |
-| Continuous personality | Stable background and conversational style, relationships and unresolved conflict by person; current mood, energy and daily life influence reactions |
-| Reply review | M1 generation and independent M2 review; M3 revision and another review when needed; dialogue and internal state are checked separately |
-| Long-term memory | Evidence-linked facts, notes and recent continuity; private/group scope isolation; correction, forgetting and hybrid retrieval |
-| Multimodal interaction | Images as model input; existing voice transcripts or optional ASR; local photos, videos and reactions, delivery history and optional asynchronous image generation |
-| Simulated life | A weekly roster, mood/energy/financial settlement and activity plans; dated event and parameter logs, showing relationship values only for the administrator |
-| Manual takeover | A browser desktop holds the shared UI lock while interactive connections exist; the last connection releases it, after which automation follows its current state |
-| Reliability | Durable queues, database cursors, send leases, real receipts, fault holds, process supervision, constrained visual recovery, optional isolated repair and backups |
+| Codex CLI | Uses the runtime user's logged-in Codex backend for model sessions and character-tool orchestration. |
+| OpenAI-compatible API | Configures a provider `baseUrl`, model ID and separate credentials. The current main conversation path requires the **Responses API**, including `/responses`, streaming and tool calling. |
 
-## Deployment
+A Chat-Completions-only service needs a gateway that provides Responses conversion; an “OpenAI-compatible” label alone is insufficient. Embeddings, ASR and image generation have separate interfaces and configuration. See [llm.ts](src/llm.ts) and [OpenAI's custom-provider documentation](https://developers.openai.com/codex/config-advanced/).
 
-**Target environment: Linux, Docker Compose, systemd, Node.js ≥ 22.13.0, Python ≥ 3.11 and a compatible Codex app-server.** Models use a logged-in Codex backend or a configured API provider. OCR runs locally with RapidOCR and ONNX Runtime. Initial WeChat login requires a human QR scan and identity verification.
+### Recommendations for Chinese character dialogue
 
-1. Read the [deployment guide and copyable AI deployment prompt](docs/DEPLOYMENT.en.md), covering host checks, credentials, networking, login, activation, acceptance, backups and recovery.
-2. Build the source, adapt the desktop templates and keep automatic intake/sending disabled. Configure persona prompts, models and the private media directory.
-3. Start the desktop, open it through an SSH tunnel, scan the QR code and verify the character account, administrator and target conversation.
-4. After offline validation and identity verification, prepare database transport and enable automation. Preserve existing identities, cursors, sessions, holds and receipts when upgrading.
+**For Chinese conversations, try DeepSeek V4.1 Flash or Gemini 3.8 Flash first.** In the author's experience with this project, these models more readily produce natural Chinese phrasing, character voice and group-chat responses. This recommendation reflects the current persona prompts and conversational setting; results depend on configuration, model version and provider.
 
-```bash
-git clone <YOUR_PRIVATE_REPOSITORY_URL> ruanruan
-cd ruanruan
-npm ci
-npm run build:desktop
-# Continue with docs/DEPLOYMENT.en.md for configuration and login.
-```
+| Model | Reference model ID | Integration considerations |
+| --- | --- | --- |
+| [DeepSeek V4.1 Flash](https://api-docs.deepseek.com/updates/) | Official API: `deepseek-flash` | Use a Responses-compatible endpoint and supported reasoning parameters. |
+| [Gemini 3.8 Flash](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/3-8-flash) | Official ID: `gemini-3.8-flash` | Use a service or gateway with Responses compatibility; provider mappings determine the actual configured model ID. |
 
-To ask an AI assistant to deploy it, copy this prompt or use the longer version in the guide:
+Generation, review and revision are separate roles. They may use independent calls to the same model or separately configured models. The repository's GPT IDs are example settings, not a provider restriction. Check that generation, review, revision and background-task model IDs all exist on the selected service. See [deployment](docs/DEPLOYMENT.en.md).
 
-> Deploy this repository using AGENTS.md, desktop/AGENTS.md and docs/DEPLOYMENT.en.md. Inspect the host and existing services, adapt the templates, and preserve unrelated projects. Build and run offline tests before installing the desktop, reader and runtime with automatic intake/sending disabled. Keep credentials local and out of Git. Leave QR scanning, phone confirmation and identity verification to me. After verification, prepare and activate database transport; I will perform live chat acceptance. Deliver access details, service status, backup/recovery instructions and remaining steps. Do not send synthetic messages or run paid model samples.
+## Quick start and deployment
 
-Host paths, interfaces, UID/GID, model providers and media locations require configuration. The detailed desktop operations reference is [desktop/README.md](desktop/README.md), currently in Chinese.
+### Requirements
+
+| Component | Requirement |
+| --- | --- |
+| Operating system | Linux with systemd, Docker and Compose |
+| Runtime | Node.js ≥ 22.13.0, Python ≥ 3.11 |
+| Model orchestration | Compatible Codex CLI/app-server; a logged-in Codex backend or Responses-compatible API service |
+| Local recognition | RapidOCR and ONNX Runtime for UI verification |
+| Initial configuration | Models/credentials, host paths/interfaces, optional private media and a WeChat account logged in through a human QR scan |
+
+### Deployment sequence
+
+1. **Prepare configuration.** Adapt paths, networking, credentials and media using the [deployment guide](docs/DEPLOYMENT.en.md), keeping automatic intake/sending disabled.
+2. **Check out and build.**
+
+   ```bash
+   git clone <YOUR_PRIVATE_REPOSITORY_URL> ruanruan
+   cd ruanruan
+   npm ci
+   npm run build:desktop
+   ```
+
+3. **Validate offline first.** Check character, review and memory logic with temporary files and mock data:
+
+   ```bash
+   npm test
+   ```
+
+   The deployment guide includes Python desktop checks and a first-install subset. Offline success is not live WeChat acceptance.
+4. **Configure the desktop and log in.** Open the isolated desktop through an SSH tunnel. A human scans, confirms on the phone and verifies both account identities and the unique owner label.
+5. **Prepare and activate.** Install the read-only reader and run `--prepare` to save bindings/watermarks. Activate only after verification, with human normal-chat acceptance.
+
+Existing installations retain identities, sessions, cursors, holds and receipts. The [deployment guide](docs/DEPLOYMENT.en.md) covers installation, backups/recovery and a copyable AI prompt. The [desktop operations reference](desktop/README.md) is currently in Chinese.
 
 ---
 
-# Technical design: persistent personality, evidence-linked memory and confirmed delivery
+## Technical design
 
-## Abstract
+### Abstract
 
 The engineering problem is maintaining identity, facts, relationships and behavior across repeated conversations, group interactions, media sharing and process restarts. The system separates fixed persona prompts, local dynamic state, evidence-linked memory, independent review and confirmed delivery. Models propose interpretations and responses; local code enforces identity, visibility, state constraints, asset availability and delivery evidence. This document describes implemented mechanisms and design tradeoffs, without presenting operational experience as controlled experiments or claiming unmeasured quality or latency improvements.
 
-## 1. Design goals and state layers
+### 1. Design goals and state layers
 
 A convincing character needs more than a writing style. She must remember who said what, distinguish plans from completed actions, avoid describing an old photo as newly taken, and avoid restoring intimacy merely because someone apologized. These concerns belong to separate state layers.
 
@@ -64,7 +120,7 @@ A convincing character needs more than a writing style. She must remember who sa
 
 The character shares her own life state across conversations. Private information remains scoped: public group context belongs to the real group ID, and relationship continuity does not authorize private-chat disclosure into a group.
 
-## 2. From an incoming message to a reply
+### 2. From an incoming message to a reply
 
 Purple nodes involve remote model requests; blue nodes run locally. **The local app-server orchestrates work; model inference may still be remote. Local OCR is not a remote model call.**
 
@@ -114,27 +170,27 @@ A speaking turn normally has **M1 generation and M2 review**. A text revision ad
 
 See [ARCHITECTURE.en.md](docs/ARCHITECTURE.en.md) for the complete flow, background branches, budgets and source entry points.
 
-## 3. Lessons from iterative persona design
+### 3. Lessons from iterative persona design
 
 The current persona does not rely on a long list of personality adjectives. It defines the evidence behind a reaction and stores persistent information in code. The following tradeoffs correspond to the current [GENERATE.md](personas/ruanruan/GENERATE.md) and [REVIEW.md](personas/ruanruan/REVIEW.md), rather than a historical changelog.
 
-### 3.1 From answering tasks to reacting as a character
+#### 3.1 From answering tasks to reacting as a character
 
 A prompt focused only on helping tends to produce a polite service agent: answering every message, summarizing, asking follow-ups and accepting formal work. The current prompt considers activity, energy, interests and relationships before deciding whether and how much to speak. Short messages and multiple bubbles are output conventions; the underlying constraint is a reaction grounded in the current situation. Group activity windows and standby observation are maintained locally. An `@` in an email address or emoticon is not a native WeChat mention.
 
-### 3.2 From mood labels to layered relationships
+#### 3.2 From mood labels to layered relationships
 
 A bad mood cannot explain every relationship change. Shared mood describes the day; affection and closeness accumulate toward a person; conflict residue tracks unresolved interactions. A brief irritation does not automatically erase a lasting relationship, and repeated apologies do not provide free affection. Willingness to repair, an attempted repair and a completed repair are distinct; completion needs evidence in the actual reply.
 
-### 3.3 From prohibition lists to grounded boundaries
+#### 3.3 From prohibition lists to grounded boundaries
 
 A temporary refusal does not automatically create a permanent taboo. Ordinary selfies, reactions and short videos have no rigid high-affection gate. The model decides willingness in context, while code checks asset existence, source and sending history. This preserves natural choice without maintaining the persona through invented claims such as having just taken a photo.
 
-### 3.4 From narration to verifiable actions
+#### 3.4 From narration to verifiable actions
 
 Wanting, planning and completing are separate meanings. Schedules, balances and energy are settled by the state machine; proposing a plan does not execute it. Retrieving an asset does not select it, and selecting it does not deliver it. An actual red-packet message can justify acknowledging the gesture, but not inventing a received amount or changing real funds.
 
-### 3.5 Generation and review have different responsibilities
+#### 3.5 Generation and review have different responsibilities
 
 Generation produces the reaction; review checks facts, persona consistency, scope and action evidence. Review should not rewrite every line into generic assistant language. When dialogue is valid and only internal state is wrong, state can be corrected alone. Text changes use one revision and re-review. Failed review retains the task instead of inserting internal errors into character dialogue.
 
@@ -148,9 +204,9 @@ Generation produces the reaction; review checks facts, persona consistency, scop
 
 These checks validate structure and evidence, not the naturalness of every exchange. Character quality still needs realistic multi-turn replay covering false memories, unnecessary refusals, excessive enthusiasm and consistency.
 
-## 4. Memory: authoritative records, retrieval indexes and long-term evolution
+### 4. Memory: authoritative records, retrieval indexes and long-term evolution
 
-### 4.1 Multiple records rather than an ever-growing summary
+#### 4.1 Multiple records rather than an ever-growing summary
 
 The message journal stores events; evidence-linked notes store preferences and observations; an atomic fact store keeps correctable structured knowledge; short-term continuity tracks unfinished topics. Relationships and the character's own life are maintained separately. Vectors help locate records and are not the sole authority for facts.
 
@@ -158,7 +214,7 @@ The message journal stores events; evidence-linked notes store preferences and o
 
 Default turn context includes at most 8 facts and 5 notes, with approximately 7,500 bytes budgeted for notes JSON. `memory_recall` retrieves more when needed. Recent history, life state, relationships and retrieved records still consume model input tokens.
 
-### 4.2 Vector-store architecture
+#### 4.2 Vector-store architecture
 
 Each visibility scope has its own `semantic-<scope hash>.sqlite3`, using SQLite, FTS5 and `sqlite-vec` without a separate always-running vector database service.
 
@@ -193,7 +249,7 @@ flowchart LR
 
 The encoder fingerprint includes provider, base URL, model, revision, dimensions, prefix, normalization, preprocessing and chunk version. **Equal dimensions, or even the same model name, do not establish the same vector space.** Different profiles are not mixed. The default embedding configuration is `text-embedding-3-small` with 1,536 dimensions; deployments must check their actual configuration and provider support.
 
-### 4.3 Hybrid recall and fallback
+#### 4.3 Hybrid recall and fallback
 
 Scope restrictions apply before two candidate paths:
 
@@ -203,7 +259,7 @@ Scope restrictions apply before two candidate paths:
 
 Brief greetings, missing vector configuration or unavailable indexes use local retrieval. Query embedding defaults to a one-second timeout, configurable from 200 to 3,000 milliseconds, then falls back to lexical results.
 
-### 4.4 Incremental indexing, consolidation and forgetting
+#### 4.4 Incremental indexing, consolidation and forgetting
 
 Messages are chunked in order, with at most 6 per chunk and boundaries around 30-minute gaps or 3,500 characters. Ordinary appends recompute the tail chunk and small notes. Source revisions and forgetting trigger the corresponding rebuild. Background embedding runs for new content during idle checks; writes revalidate document ID, hash and row identity so late responses cannot restore deleted or corrected material.
 
@@ -213,15 +269,15 @@ Forgetting uses tombstones to prevent replay from recreating the same fact, remo
 
 Source: [memory-fact-store.ts](src/memory-fact-store.ts), [memory-context.ts](src/memory-context.ts), [semantic-memory.ts](src/semantic-memory.ts), [memory-recall.ts](src/memory-recall.ts), [consolidation.ts](src/consolidation.ts).
 
-## 5. Images and videos: archival, selection and delivery
+### 5. Images and videos: archival, selection and delivery
 
-### 5.1 Catalog structure and provenance
+#### 5.1 Catalog structure and provenance
 
 Deployers supply the private library. The original and generated-asset catalog JSON files are merged. Entries contain a stable `asset_id`, type, file, title, description, tags, suggested uses, character ID and SHA256, with optional video source, watermark/end-card and scene-reference metadata. `realpath` validation restricts files to the configured image, video and cartoon-character directories.
 
 Provenance distinguishes supplied character media, generated scenes and reaction services. Library membership does not establish today's outfit, current location or a newly taken photo. Extracted video frames are marked `video_frame`; cartoon reactions express feelings rather than proving an action occurred. `refresh-local-media` maintains conventionally named cartoon expressions/actions and scene references while preserving other manually maintained entries. It does not automatically understand an arbitrary media folder.
 
-### 5.2 Selecting relevant media
+#### 5.2 Selecting relevant media
 
 Current media search uses **catalog text and tag matching**, without a media semantic vector index. It filters by type, reaction purpose or scene reference, then scores titles, descriptions and tags. Explicit topics favor relevant matches; random selection still respects the topic filter.
 
@@ -229,7 +285,7 @@ Candidates diversify clips from the same source video and deprioritize the last 
 
 Incoming images first use exact SHA256 matching, then a 256-bit dHash from a 17×16 thumbnail, color difference and candidate separation against the known album. Screenshots may have their main image region extracted. Fingerprints are cached by size, mtime and directory state. This matches approximately whole known images; it is not face recognition and does not guarantee identification from arbitrary crops or new photos.
 
-### 5.3 Candidates, reservations and receipts
+#### 5.3 Candidates, reservations and receipts
 
 ```mermaid
 flowchart LR
@@ -247,7 +303,7 @@ flowchart LR
 
 In `media-state/<conversation hash>.sqlite3`, `reservations` tracks the job, asset and content hash; `sends` also records source group and send time. Transactions reduce concurrent duplicates; only a real media receipt confirms delivery. A failed caption does not undo an already-sent image, and uncertain delivery is not released for blind retry. Resetting character memory does not reset media sending history.
 
-### 5.4 Optional image generation
+#### 5.4 Optional image generation
 
 When no suitable asset exists and configuration allows it, the character may choose an image-generation plan. It must pass review, and its foreground reply must be delivered before the plan is queued. Jobs are persistent and count against daily quota when queued; interrupted requests are marked failed rather than automatically paying for another generation after restart.
 
@@ -255,11 +311,11 @@ Generation uses character references and optional scene references. Images, SHA2
 
 Source: [media-catalog.ts](src/media-catalog.ts), [media-recognition.ts](src/media-recognition.ts), [media-state.ts](src/media-state.ts), [character-media.ts](src/character-media.ts), [generated-images.ts](src/generated-images.ts).
 
-## 6. Latency and resource optimization
+### 6. Latency and resource optimization
 
 End-to-end latency consists of `intake/batching + context preparation + generation/tool round trips + review/revision + UI queueing + sending/receipt`. One API duration does not represent what the user experiences, and background CPU/memory contention can worsen tail latency.
 
-### 6.1 Implemented measures
+#### 6.1 Implemented measures
 
 | Measure | Effect and tradeoff |
 | --- | --- |
@@ -276,7 +332,7 @@ End-to-end latency consists of `intake/batching + context preparation + generati
 
 Disabling Fast is a configuration decision, not a claim that Fast never helps. Outdated temporary benchmarks are not published as product metrics.
 
-### 6.2 Proposed next steps, not yet implemented
+#### 6.2 Proposed next steps, not yet implemented
 
 1. **Measure per-stage p50/p95 first.** Track queueing, generation, tools, review, UI and receipts separately for text, images, speech and revision.
 2. **Evaluate batching windows by scenario.** Retain batching for consecutive messages and test shorter waits for complete short input, measuring stale replies as well as speed.
@@ -286,7 +342,7 @@ Disabling Fast is a configuration decision, not a claim that Fast never helps. O
 
 These are proposals for validation, not completed features. Reducing repeated requests and wasted work takes priority over more quota or hardware.
 
-## 7. Recovery, takeover and operating boundaries
+### 7. Recovery, takeover and operating boundaries
 
 Systemd restarts processes; durable cursors, tasks, queues and receipts restore progress. Known delivery continues from the next step; unknown delivery stays held for inspection. Account verification and logout require a human, without automated verification, relogin or appeal clicks.
 
@@ -296,7 +352,7 @@ Backups use SQLite's backup API and manifest validation. Each database snapshot 
 
 Voice transcripts may be wrong. Prefer existing transcripts, otherwise use cached ASR from real audio. Ambiguous names, amounts, negation or important actions should be confirmed briefly rather than treated as certain facts.
 
-## 8. Validation and reproduction
+### 8. Validation and reproduction
 
 Offline tests cover routing, batching, review, fact scopes, encoder profiles, media receipts, manual takeover, recovery and backups with mocks and temporary files/databases. The deployment guide lists a first-install subset; `npm test` runs TypeScript tests and Python desktop tests live in `tests/`. Real WeChat behavior, speech, image quality and conversational naturalness still require acceptance in the target environment.
 

@@ -89,6 +89,10 @@ Set `exchangeDirectory` and `queueDirectory` in `bridge.json` to actual absolute
 | Review | `gpt-6-sol` | `low` | `default` |
 | Revision | `gpt-6.1-sol` | `medium` | `default` |
 
+**Model integration and selection:** The project supports Codex CLI (`app-server`) and OpenAI-format model APIs. The main conversation path uses Responses API: providers must support `/responses`, streaming and tool calling. Chat-Completions-only services need a gateway with Responses conversion. API mode still uses local Codex CLI orchestration; it does not imply local model inference.
+
+For Chinese character dialogue, try **DeepSeek V4.1 Flash** or **Gemini 3.8 Flash** first. This reflects the author's preference for their Chinese voice and group-chat responses in this project. See the [overview model section](../README.en.md#model-integration-and-recommendations) for model IDs, compatibility boundaries and official references. GPT IDs in the examples are reference settings. When switching providers, check generation, review, revision and background-task model IDs rather than changing only `baseUrl`.
+
 Your provider must support the configured models; report unavailable models. Use a logged-in Codex backend or an API provider. Save this API example to `app/providers/llm.json`:
 
 ```json
@@ -271,3 +275,4 @@ A human must scan the official client QR code, approve phone login, and verify b
 Do not run live model samples, send synthetic messages, click verification/appeal controls or blindly resend uncertain deliveries. I will perform live chat acceptance. Continue authorized reversible setup without requesting approval for each command.
 Deliver changed files, local config/data paths, offline results, start/stop/status/log commands, the browser entry, takeover/release instructions, optional capability status and exact remaining human steps. Distinguish offline validation, running services and confirmed delivery. Do not promise zero-configuration setup or complete live acceptance.
 ```
+
